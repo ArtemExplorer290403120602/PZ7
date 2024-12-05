@@ -1,7 +1,10 @@
-name: PHP Workflow
+name: CI
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -16,25 +19,11 @@ jobs:
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.0' # Укажите нужную версию PHP
-        extensions: mbstring, xml, curl # Укажите необходимые расширения PHP
+        php-version: '8.0' # Укажите вашу версию PHP
+        extensions: mbstring, xml, curl, zip
 
     - name: Install dependencies
-      run: |
-        composer install # Убедитесь, что у вас есть composer.json
+      run: composer install
 
-    - name: Run tests
-      run: |
-        ./vendor/bin/phpunit # Запустите ваши тесты
-
-    - name: SonarQube Scan
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      run: |
-        composer global require "sonarsource/sonar-scanner-cli"
-        sonar-scanner \
-          -Dsonar.projectKey=sqp_8e38ff61acba72b0b7be43b707f5f6d67c402f7a \
-          -Dsonar.sources=. \
-          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+    - name: Run PHPUnit tests
+      run: ./vendor/bin/phpunit
